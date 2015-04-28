@@ -31,14 +31,15 @@ func TestRediaoHelper(t *testing.T) {
 	if err := HMSET(conn, k, m); err != nil {
 		msg := fmt.Sprintf("HMSET(%v, %v), err: %v", k, m, err)
 		t.Error(msg)
+	} else {
+		logger.Printf("HSET(conn, %v, m): ok", k)
 	}
-	logger.Printf("HSET(conn, %v, m): ok", k)
 
 	m, err := HGETALL(conn, k)
 	if err != nil {
 		msg := fmt.Sprintf("HGETALL(conn, %v), err: %v", k, err)
 		t.Error(msg)
+	} else {
+		logger.Printf("HGETALL(%v): %v", k, m)
 	}
-
-	logger.Printf("HGETALL(%v): %v", k, m)
 }
