@@ -13,7 +13,7 @@ var (
 	logger           *log.Logger
 	DEF_MAX_IDLE     int           = 3
 	DEF_MAX_ACTIVE   int           = 1000
-	DEF_IDLE_TIMEOUT time.Duration = 3 * time.Second
+	DEF_IDLE_TIMEOUT time.Duration = 180 * time.Second
 )
 
 func CheckKey(key string) error {
@@ -97,7 +97,7 @@ func HGETALL(conn redis.Conn, key string) (m map[string]string, err error) {
 //     idleTimeoutSec: Close connections after remaining idle for this duration.
 //         If the value is zero, then idle connections are not closed.
 //         Applications should set the timeout to a value less than the server's timeout.
-//         You may use DEF_IDLE_TIMEOUT: 3 * time.Second
+//         You may use DEF_IDLE_TIMEOUT: 180 * time.Second
 // Return:
 //     *redis.Pool
 // References:
