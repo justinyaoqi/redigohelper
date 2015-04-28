@@ -78,7 +78,7 @@ func HGETALL(conn redis.Conn, key string) (m map[string]string, err error) {
 	args = append(args, key)
 
 	if m, err = redis.StringMap(conn.Do(cmd, args...)); err != nil {
-		logger.Printf("HGETALL(%v) error", key)
+		logger.Printf("HGETALL(%v) err: %v", key, err)
 		return nil, err
 	}
 
