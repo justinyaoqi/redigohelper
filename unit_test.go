@@ -9,7 +9,7 @@ import (
 var (
 	pool          *redis.Pool
 	redisServer   = ":6379"
-	redisPassword = "Password123!"
+	redisPassword = ""
 )
 
 func TestRediaoHelper(t *testing.T) {
