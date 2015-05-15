@@ -38,6 +38,69 @@ func CheckMap(m map[string]string) error {
 	return nil
 }
 
+func SET(conn redis.Conn, key, value string) error {
+	msg := ""
+	if err := CheckKey(key); err != nil {
+		msg = "CheckKey() err"
+		logger.Printf(msg)
+		return err
+	}
+
+	cmd := "SET"
+	args := []interface{}{}
+	args = append(args, key, value)
+
+	if _, err := conn.Do(cmd, args...); err != nil {
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
+		logger.Printf(msg)
+		return err
+	}
+
+	return nil
+}
+
+func GET(conn redis.Conn, key string) (value string, err error) {
+	msg := ""
+	if err := CheckKey(key); err != nil {
+		msg = "CheckKey() err"
+		logger.Printf(msg)
+		return "", err
+	}
+
+	cmd := "GET"
+	args := []interface{}{}
+	args = append(args, key)
+
+	if value, err = redis.String(conn.Do(cmd, args...)); err != nil {
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
+		logger.Printf(msg)
+		return "", err
+	}
+
+	return value, nil
+}
+
+func INCR(conn redis.Conn, key string) (n int64, err error) {
+	msg := ""
+	if err := CheckKey(key); err != nil {
+		msg = "CheckKey() err"
+		logger.Printf(msg)
+		return 0, err
+	}
+
+	cmd := "INCR"
+	args := []interface{}{}
+	args = append(args, key)
+
+	if n, err = redis.Int64(conn.Do(cmd, args...)); err != nil {
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
+		logger.Printf(msg)
+		return 0, err
+	}
+
+	return n, nil
+}
+
 func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
@@ -60,7 +123,7 @@ func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	}
 
 	if _, err := conn.Do(cmd, args...); err != nil {
-		msg = fmt.Sprintf("SetHash(): conn.Do(%v, %v): err: %v", cmd, args, err)
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
 		logger.Printf(msg)
 		return err
 	}

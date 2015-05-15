@@ -9,7 +9,7 @@ import (
 var (
 	pool          *redis.Pool
 	redisServer   = ":6379"
-	redisPassword = ""
+	redisPassword = "123456"
 )
 
 func TestRediaoHelper(t *testing.T) {
@@ -42,4 +42,31 @@ func TestRediaoHelper(t *testing.T) {
 	} else {
 		logger.Printf("HGETALL(%v): %v", k, m)
 	}
+
+	k = "mykey"
+	v := "myvalue"
+	if err = SET(conn, k, v); err != nil {
+		msg := fmt.Sprintf("SET(conn, %v, %v), err: %v", k, v, err)
+		t.Error(msg)
+	} else {
+		logger.Printf("SET(conn, %v, %v): OK", k, v)
+	}
+
+	if v, err = GET(conn, k); err != nil {
+		msg := fmt.Sprintf("GET(conn, %v), err: %v", k, err)
+		t.Error(msg)
+	} else {
+		logger.Printf("GET(conn, %v): %v", k, v)
+	}
+
+	k = "lastid"
+	for i := 0; i < 5; i++ {
+		if n, err := INCR(conn, k); err != nil {
+			msg := fmt.Sprintf("INCR(conn, %v), err: %v", k, err)
+			t.Error(msg)
+		} else {
+			logger.Printf("INCR(conn, %v): %v", k, n)
+		}
+	}
+
 }
