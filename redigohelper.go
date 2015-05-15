@@ -101,6 +101,55 @@ func INCR(conn redis.Conn, key string) (n int64, err error) {
 	return n, nil
 }
 
+func EXISTS(conn redis.Conn, key string) (exists bool, err error) {
+	msg := ""
+	if err := CheckKey(key); err != nil {
+		msg = "CheckKey() err"
+		logger.Printf(msg)
+		return false, err
+	}
+
+	cmd := "EXISTS"
+	args := []interface{}{}
+	args = append(args, key)
+
+	if exists, err = redis.Bool(conn.Do(cmd, args...)); err != nil {
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
+		logger.Printf(msg)
+		return false, err
+	}
+
+	return exists, nil
+}
+
+func DEL(conn redis.Conn, keys []string) (n int64, err error) {
+	msg := ""
+	if len(keys) == 0 {
+		return 0, errors.New("no keys")
+	}
+
+	cmd := "DEL"
+	args := []interface{}{}
+
+	for _, k := range keys {
+		if err := CheckKey(k); err != nil {
+			msg = "CheckKey() err"
+			logger.Printf(msg)
+			return 0, err
+		} else {
+			args = append(args, k)
+		}
+	}
+
+	if n, err = redis.Int64(conn.Do(cmd, args...)); err != nil {
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
+		logger.Printf(msg)
+		return 0, err
+	}
+
+	return n, nil
+}
+
 func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
