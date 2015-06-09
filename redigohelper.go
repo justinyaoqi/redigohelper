@@ -238,5 +238,5 @@ func NewPool(server, password string, maxIdle, maxActive int, idleTimeout time.D
 }
 
 func init() {
-	logger = fnlog.New("")
+	logger = fnlog.New("", true, false, false)
 }
