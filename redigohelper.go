@@ -4,13 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/garyburd/redigo/redis"
-	"github.com/northbright/fnlog"
-	"log"
 	"time"
 )
 
 var (
-	logger           *log.Logger
+	DEBUG            bool          = false // set it to true to output debug messages from this package.
 	DEF_MAX_IDLE     int           = 3
 	DEF_MAX_ACTIVE   int           = 1000
 	DEF_IDLE_TIMEOUT time.Duration = 180 * time.Second
@@ -19,8 +17,10 @@ var (
 func CheckKey(key string) error {
 	msg := ""
 	if key == "" {
-		msg = "empty key"
-		logger.Println(msg)
+		msg = "empty key\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return errors.New(msg)
 	}
 
@@ -30,8 +30,10 @@ func CheckKey(key string) error {
 func CheckMap(m map[string]string) error {
 	msg := ""
 	if len(m) == 0 {
-		msg = "empty map"
-		logger.Println(msg)
+		msg = "empty map\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return errors.New(msg)
 	}
 
@@ -41,8 +43,10 @@ func CheckMap(m map[string]string) error {
 func SET(conn redis.Conn, key, value string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err"
-		logger.Printf(msg)
+		msg = "CheckKey() err\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return err
 	}
 
@@ -51,8 +55,10 @@ func SET(conn redis.Conn, key, value string) error {
 	args = append(args, key, value)
 
 	if _, err := conn.Do(cmd, args...); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
-		logger.Printf(msg)
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return err
 	}
 
@@ -62,8 +68,10 @@ func SET(conn redis.Conn, key, value string) error {
 func GET(conn redis.Conn, key string) (value string, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err"
-		logger.Printf(msg)
+		msg = "CheckKey() err\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return "", err
 	}
 
@@ -72,8 +80,10 @@ func GET(conn redis.Conn, key string) (value string, err error) {
 	args = append(args, key)
 
 	if value, err = redis.String(conn.Do(cmd, args...)); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
-		logger.Printf(msg)
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return "", err
 	}
 
@@ -83,8 +93,10 @@ func GET(conn redis.Conn, key string) (value string, err error) {
 func INCR(conn redis.Conn, key string) (n int64, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err"
-		logger.Printf(msg)
+		msg = "CheckKey() err\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return 0, err
 	}
 
@@ -93,8 +105,10 @@ func INCR(conn redis.Conn, key string) (n int64, err error) {
 	args = append(args, key)
 
 	if n, err = redis.Int64(conn.Do(cmd, args...)); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
-		logger.Printf(msg)
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return 0, err
 	}
 
@@ -104,8 +118,10 @@ func INCR(conn redis.Conn, key string) (n int64, err error) {
 func EXISTS(conn redis.Conn, key string) (exists bool, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err"
-		logger.Printf(msg)
+		msg = "CheckKey() err\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return false, err
 	}
 
@@ -114,8 +130,10 @@ func EXISTS(conn redis.Conn, key string) (exists bool, err error) {
 	args = append(args, key)
 
 	if exists, err = redis.Bool(conn.Do(cmd, args...)); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
-		logger.Printf(msg)
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return false, err
 	}
 
@@ -133,8 +151,10 @@ func DEL(conn redis.Conn, keys []string) (n int64, err error) {
 
 	for _, k := range keys {
 		if err := CheckKey(k); err != nil {
-			msg = "CheckKey() err"
-			logger.Printf(msg)
+			msg = "CheckKey() err\n"
+			if DEBUG {
+				fmt.Printf(msg)
+			}
 			return 0, err
 		} else {
 			args = append(args, k)
@@ -142,8 +162,10 @@ func DEL(conn redis.Conn, keys []string) (n int64, err error) {
 	}
 
 	if n, err = redis.Int64(conn.Do(cmd, args...)); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
-		logger.Printf(msg)
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return 0, err
 	}
 
@@ -153,14 +175,18 @@ func DEL(conn redis.Conn, keys []string) (n int64, err error) {
 func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err"
-		logger.Printf(msg)
+		msg = "CheckKey() err\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return err
 	}
 
 	if err := CheckMap(m); err != nil {
-		msg = "CheckMap() err"
-		logger.Printf(msg)
+		msg = "CheckMap() err\n"
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return err
 	}
 
@@ -172,8 +198,10 @@ func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	}
 
 	if _, err := conn.Do(cmd, args...); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v", cmd, args, err)
-		logger.Printf(msg)
+		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+		if DEBUG {
+			fmt.Printf(msg)
+		}
 		return err
 	}
 
@@ -190,7 +218,9 @@ func HGETALL(conn redis.Conn, key string) (m map[string]string, err error) {
 	args = append(args, key)
 
 	if m, err = redis.StringMap(conn.Do(cmd, args...)); err != nil {
-		logger.Printf("HGETALL(%v) err: %v", key, err)
+		if DEBUG {
+			fmt.Printf("HGETALL(%v) err: %v\n", key, err)
+		}
 		return nil, err
 	}
 
@@ -235,8 +265,4 @@ func NewPool(server, password string, maxIdle, maxActive int, idleTimeout time.D
 			return err
 		},
 	}
-}
-
-func init() {
-	logger = fnlog.New("", true, false, false)
 }
