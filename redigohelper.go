@@ -7,11 +7,14 @@ import (
 	"time"
 )
 
-var (
-	DEBUG            bool          = false             // Set it to true to output debug messages from this package.
+const (
 	DEF_MAX_IDLE     int           = 3                 // Default maximum number of idle connections in the pool.
 	DEF_MAX_ACTIVE   int           = 1000              // Default maximum number of connections allocated by the pool at a given time. When zero, there's no limit on the number of connections.
 	DEF_IDLE_TIMEOUT time.Duration = 180 * time.Second // Default duration that it'll close connections after remaining idle for this duration.
+)
+
+var (
+	DEBUG bool = false // Set it to true to output debug messages from this package.
 )
 
 func CheckKey(key string) error {
