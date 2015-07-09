@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	DEBUG            bool          = false // set it to true to output debug messages from this package.
-	DEF_MAX_IDLE     int           = 3
-	DEF_MAX_ACTIVE   int           = 1000
-	DEF_IDLE_TIMEOUT time.Duration = 180 * time.Second
+	DEBUG            bool          = false             // Set it to true to output debug messages from this package.
+	DEF_MAX_IDLE     int           = 3                 // Default maximum number of idle connections in the pool.
+	DEF_MAX_ACTIVE   int           = 1000              // Default maximum number of connections allocated by the pool at a given time. When zero, there's no limit on the number of connections.
+	DEF_IDLE_TIMEOUT time.Duration = 180 * time.Second // Default duration that it'll close connections after remaining idle for this duration.
 )
 
 func CheckKey(key string) error {
@@ -227,23 +227,24 @@ func HGETALL(conn redis.Conn, key string) (m map[string]string, err error) {
 	return m, nil
 }
 
-// New a connection pool
-// Params:
-//     server: Redis Server Address. Ex: "192.168.0.1:8080", ":8080"
-//     password: Redis Password
-//     maxIdle: Maximum number of idle connections in the pool.
-//         You may use DEF_MAX_IDLE: 3.
-//     maxActive: Maximum number of connections allocated by the pool at a given time.
-//         When zero, there is no limit on the number of connections in the pool.
-//         You may use DEF_MAX_ACTIVE: 1000.
-//     idleTimeoutSec: Close connections after remaining idle for this duration.
-//         If the value is zero, then idle connections are not closed.
-//         Applications should set the timeout to a value less than the server's timeout.
-//         You may use DEF_IDLE_TIMEOUT: 180 * time.Second
-// Return:
-//     *redis.Pool
-// References:
-//     <http://godoc.org/github.com/garyburd/redigo/redis#Pool>
+// NewPool() creates a connection pool.
+//
+//   Params:
+//       server: Redis Server Address. Ex: "192.168.0.1:8080", ":8080"
+//       password: Redis Password
+//       maxIdle: Maximum number of idle connections in the pool.
+//           You may use DEF_MAX_IDLE: 3.
+//       maxActive: Maximum number of connections allocated by the pool at a given time.
+//           When zero, there is no limit on the number of connections in the pool.
+//           You may use DEF_MAX_ACTIVE: 1000.
+//       idleTimeoutSec: Close connections after remaining idle for this duration.
+//           If the value is zero, then idle connections are not closed.
+//           Applications should set the timeout to a value less than the server's timeout.
+//           You may use DEF_IDLE_TIMEOUT: 180 * time.Second
+//   Return:
+//       *redis.Pool
+//   References:
+//       <http://godoc.org/github.com/garyburd/redigo/redis#Pool>
 func NewPool(server, password string, maxIdle, maxActive int, idleTimeout time.Duration) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle:     maxIdle,     // default: 3
@@ -265,4 +266,9 @@ func NewPool(server, password string, maxIdle, maxActive int, idleTimeout time.D
 			return err
 		},
 	}
+}
+
+// NewDefaultPool() creates a connection pool with default parameters.
+func NewDefaultPool(server, password string) *redis.Pool {
+	return NewPool(server, password, DEF_MAX_IDLE, DEF_MAX_ACTIVE, DEF_IDLE_TIMEOUT)
 }
