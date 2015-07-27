@@ -1,4 +1,4 @@
-// Package redigohelper provides helper functions to make it easy to use [redigo](http://github.com/garyburd/redigo/redis).
+// Package redigohelper provides helper functions to make it easy to use redigo - http://github.com/garyburd/redigo.
 package redigohelper
 
 import (
