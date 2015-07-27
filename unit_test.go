@@ -16,7 +16,11 @@ var (
 func Example() {
 	fmt.Fprintf(os.Stderr, "NewPool()...\n")
 
-	pool := redigohelper.NewPool(redisServer, redisPassword, redigohelper.DEF_MAX_IDLE, redigohelper.DEF_MAX_ACTIVE, redigohelper.DEF_IDLE_TIMEOUT)
+	// Create Redis connection pool
+	//pool := redigohelper.NewPool(redisServer, redisPassword, redigohelper.DEF_MAX_IDLE, redigohelper.DEF_MAX_ACTIVE, redigohelper.DEF_IDLE_TIMEOUT)
+
+	// Create Redis connection pool with default arguments.
+	pool := redigohelper.NewDefaultPool(redisServer, redisPassword)
 
 	conn := pool.Get()
 	defer conn.Close()
