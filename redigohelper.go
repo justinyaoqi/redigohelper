@@ -1,3 +1,4 @@
+// Package redigohelper provides helper functions to make it easy to use [redigo](http://github.com/garyburd/redigo/redis).
 package redigohelper
 
 import (
@@ -17,6 +18,7 @@ var (
 	DEBUG bool = false // Set it to true to output debug messages from this package.
 )
 
+// CheckKey() Checks if key is empty.
 func CheckKey(key string) error {
 	msg := ""
 	if key == "" {
@@ -30,6 +32,7 @@ func CheckKey(key string) error {
 	return nil
 }
 
+// CheckMap() Checks if map is empty.
 func CheckMap(m map[string]string) error {
 	msg := ""
 	if len(m) == 0 {
@@ -43,6 +46,7 @@ func CheckMap(m map[string]string) error {
 	return nil
 }
 
+// SET() does the "SET" command.
 func SET(conn redis.Conn, key, value string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
@@ -60,6 +64,7 @@ func SET(conn redis.Conn, key, value string) error {
 	return nil
 }
 
+// GET() does the "GET" command.
 func GET(conn redis.Conn, key string) (value string, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
@@ -77,6 +82,7 @@ func GET(conn redis.Conn, key string) (value string, err error) {
 	return value, nil
 }
 
+// INCR() does the "INCR" command.
 func INCR(conn redis.Conn, key string) (n int64, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
@@ -94,6 +100,7 @@ func INCR(conn redis.Conn, key string) (n int64, err error) {
 	return n, nil
 }
 
+// EXISTS() does the "EXISTS" command.
 func EXISTS(conn redis.Conn, key string) (exists bool, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
@@ -111,6 +118,14 @@ func EXISTS(conn redis.Conn, key string) (exists bool, err error) {
 	return exists, nil
 }
 
+// DEL() does the "DEL" command.
+//
+//   Params:
+//       conn: redis.Conn
+//       keys: the keys to be deleted.
+//   Return:
+//       n: The number of keys that were removed.
+//       err: nil if no error occurs or specified error otherwise.
 func DEL(conn redis.Conn, keys []string) (n int64, err error) {
 	msg := ""
 	if len(keys) == 0 {
@@ -139,6 +154,14 @@ func DEL(conn redis.Conn, keys []string) (n int64, err error) {
 	return n, nil
 }
 
+// HMSET() does the "HMSET" command.
+//
+//   Params:
+//       conn: redis.Conn.
+//       key: key to store the hash.
+//       m: map contains the specified fields and their respective values.
+//   Return:
+//       nil if no error occurs or specified error otherwise.
 func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
@@ -167,6 +190,14 @@ func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	return nil
 }
 
+// HGETALL() does the "HGETALL" command.
+//
+//   Params:
+//       conn: redis.Conn.
+//       key: key stores the hash.
+//   Return:
+//       m: map contains the specified fields and their respective values.
+//       err: nil if no error occurs or specified error otherwise.
 func HGETALL(conn redis.Conn, key string) (m map[string]string, err error) {
 	if err = CheckKey(key); err != nil {
 		return nil, err
