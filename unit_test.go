@@ -16,15 +16,17 @@ var (
 func Example() {
 	fmt.Fprintf(os.Stderr, "NewPool()...\n")
 
-	// Create Redis connection pool
+	// Create Redis connection pool.
 	//pool := redigohelper.NewPool(redisServer, redisPassword, redigohelper.DEF_MAX_IDLE, redigohelper.DEF_MAX_ACTIVE, redigohelper.DEF_IDLE_TIMEOUT)
 
 	// Create Redis connection pool with default arguments.
 	pool := redigohelper.NewDefaultPool(redisServer, redisPassword)
 
+	// Get the connection from the pool.
 	conn := pool.Get()
 	defer conn.Close()
 
+	// Prepare the map for HMSET
 	m := map[string]string{}
 	m["name"] = "王老师"
 	m["mobile"] = "13800138000"
