@@ -20,9 +20,9 @@ var (
 func CheckKey(key string) error {
 	msg := ""
 	if key == "" {
-		msg = "empty key\n"
+		msg = "empty key."
 		if DEBUG {
-			fmt.Printf(msg)
+			fmt.Println(msg)
 		}
 		return errors.New(msg)
 	}
@@ -33,9 +33,9 @@ func CheckKey(key string) error {
 func CheckMap(m map[string]string) error {
 	msg := ""
 	if len(m) == 0 {
-		msg = "empty map\n"
+		msg = "empty map."
 		if DEBUG {
-			fmt.Printf(msg)
+			fmt.Println(msg)
 		}
 		return errors.New(msg)
 	}
@@ -46,19 +46,11 @@ func CheckMap(m map[string]string) error {
 func SET(conn redis.Conn, key, value string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err\n"
-		if DEBUG {
-			fmt.Printf(msg)
-		}
 		return err
 	}
 
-	cmd := "SET"
-	args := []interface{}{}
-	args = append(args, key, value)
-
-	if _, err := conn.Do(cmd, args...); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+	if _, err := conn.Do("SET", key, value); err != nil {
+		msg = fmt.Sprintf("conn.Do(SET, %v, %v): err: %v\n", key, value, err)
 		if DEBUG {
 			fmt.Printf(msg)
 		}
@@ -71,19 +63,11 @@ func SET(conn redis.Conn, key, value string) error {
 func GET(conn redis.Conn, key string) (value string, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err\n"
-		if DEBUG {
-			fmt.Printf(msg)
-		}
 		return "", err
 	}
 
-	cmd := "GET"
-	args := []interface{}{}
-	args = append(args, key)
-
-	if value, err = redis.String(conn.Do(cmd, args...)); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+	if value, err = redis.String(conn.Do("GET", key)); err != nil {
+		msg = fmt.Sprintf("conn.Do(GET, %v): err: %v\n", key, err)
 		if DEBUG {
 			fmt.Printf(msg)
 		}
@@ -96,19 +80,11 @@ func GET(conn redis.Conn, key string) (value string, err error) {
 func INCR(conn redis.Conn, key string) (n int64, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err\n"
-		if DEBUG {
-			fmt.Printf(msg)
-		}
 		return 0, err
 	}
 
-	cmd := "INCR"
-	args := []interface{}{}
-	args = append(args, key)
-
-	if n, err = redis.Int64(conn.Do(cmd, args...)); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+	if n, err = redis.Int64(conn.Do("INCR", key)); err != nil {
+		msg = fmt.Sprintf("conn.Do(INCR, %v): err: %v\n", key, err)
 		if DEBUG {
 			fmt.Printf(msg)
 		}
@@ -121,19 +97,11 @@ func INCR(conn redis.Conn, key string) (n int64, err error) {
 func EXISTS(conn redis.Conn, key string) (exists bool, err error) {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err\n"
-		if DEBUG {
-			fmt.Printf(msg)
-		}
 		return false, err
 	}
 
-	cmd := "EXISTS"
-	args := []interface{}{}
-	args = append(args, key)
-
-	if exists, err = redis.Bool(conn.Do(cmd, args...)); err != nil {
-		msg = fmt.Sprintf("conn.Do(%v, %v): err: %v\n", cmd, args, err)
+	if exists, err = redis.Bool(conn.Do("EXISTS", key)); err != nil {
+		msg = fmt.Sprintf("conn.Do(EXISTS, %v): err: %v\n", key, err)
 		if DEBUG {
 			fmt.Printf(msg)
 		}
@@ -154,10 +122,6 @@ func DEL(conn redis.Conn, keys []string) (n int64, err error) {
 
 	for _, k := range keys {
 		if err := CheckKey(k); err != nil {
-			msg = "CheckKey() err\n"
-			if DEBUG {
-				fmt.Printf(msg)
-			}
 			return 0, err
 		} else {
 			args = append(args, k)
@@ -178,18 +142,10 @@ func DEL(conn redis.Conn, keys []string) (n int64, err error) {
 func HMSET(conn redis.Conn, key string, m map[string]string) error {
 	msg := ""
 	if err := CheckKey(key); err != nil {
-		msg = "CheckKey() err\n"
-		if DEBUG {
-			fmt.Printf(msg)
-		}
 		return err
 	}
 
 	if err := CheckMap(m); err != nil {
-		msg = "CheckMap() err\n"
-		if DEBUG {
-			fmt.Printf(msg)
-		}
 		return err
 	}
 
@@ -216,11 +172,7 @@ func HGETALL(conn redis.Conn, key string) (m map[string]string, err error) {
 		return nil, err
 	}
 
-	cmd := "HGETALL"
-	args := []interface{}{}
-	args = append(args, key)
-
-	if m, err = redis.StringMap(conn.Do(cmd, args...)); err != nil {
+	if m, err = redis.StringMap(conn.Do("HGETALL", key)); err != nil {
 		if DEBUG {
 			fmt.Printf("HGETALL(%v) err: %v\n", key, err)
 		}
